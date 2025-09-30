@@ -1,0 +1,361 @@
+/* LinkedInScholar Dark Theme Styles */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom CSS Variables for Dark Theme */
+:root {
+  --color-primary: #8b5cf6;
+  --color-primary-dark: #7c3aed;
+  --color-secondary: #ec4899;
+  --color-background: #000000;
+  --color-surface: #0a0a0a;
+  --color-surface-light: #1a1a1a;
+  --color-text: #ffffff;
+  --color-text-muted: #9ca3af;
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-glass: rgba(255, 255, 255, 0.05);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --backdrop-blur: blur(20px);
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection Styles */
+::selection {
+  background: rgba(139, 92, 246, 0.3);
+  color: white;
+}
+
+::-moz-selection {
+  background: rgba(139, 92, 246, 0.3);
+  color: white;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Glass Morphism Components */
+.glass {
+  background: var(--color-glass);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-glass);
+}
+
+.glass-card {
+  @apply glass rounded-2xl p-6;
+}
+
+.glass-button {
+  @apply glass rounded-xl px-6 py-3 font-medium transition-all duration-300;
+}
+
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+}
+
+/* Purple Gradient Components */
+.gradient-purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+}
+
+.gradient-purple-subtle {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+}
+
+.text-gradient-purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Button Components */
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black;
+}
+
+.btn-primary {
+  @apply btn bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 shadow-lg hover:shadow-purple-glow;
+}
+
+.btn-secondary {
+  @apply btn glass-button text-white hover:text-purple-300;
+}
+
+.btn-ghost {
+  @apply btn text-purple-400 hover:text-purple-300 hover:bg-purple-500/10;
+}
+
+/* Card Components */
+.card {
+  @apply glass-card transition-all duration-300;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.2);
+}
+
+.card-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.card-title {
+  @apply text-xl font-bold text-white;
+}
+
+.card-subtitle {
+  @apply text-sm text-gray-400;
+}
+
+.card-content {
+  @apply text-gray-300;
+}
+
+/* Input Components */
+.input {
+  @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300;
+}
+
+.input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.label {
+  @apply block text-sm font-medium text-gray-300 mb-2;
+}
+
+/* Loading States */
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-gray-600 border-t-purple-500;
+}
+
+.loading-pulse {
+  @apply animate-pulse bg-gray-700 rounded;
+}
+
+/* Toast Notifications (for react-hot-toast) */
+.toast-success {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+  color: #10b981 !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+.toast-error {
+  background: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  color: #ef4444 !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.5s ease-in-out;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive Design Utilities */
+@media (max-width: 640px) {
+  .glass-card {
+    @apply p-4;
+  }
+  
+  .btn {
+    @apply px-4 py-2 text-sm;
+  }
+}
+
+/* Focus Styles for Accessibility */
+.focus-visible {
+  @apply focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black;
+}
+
+/* Custom Utility Classes */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.border-gradient {
+  border-image: linear-gradient(135deg, #8b5cf6, #ec4899) 1;
+}
+
+.backdrop-blur-glass {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Layout Classes */
+.container-custom {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.section-padding {
+  @apply py-16 sm:py-20 lg:py-24;
+}
+
+/* Dashboard Layout */
+.dashboard-layout {
+  @apply min-h-screen bg-black;
+}
+
+.dashboard-sidebar {
+  @apply glass-card h-full;
+}
+
+.dashboard-main {
+  @apply flex-1 p-6 lg:p-8;
+}
+
+/* Resume Builder Styles */
+.resume-preview {
+  @apply bg-white text-black p-8 rounded-lg shadow-2xl;
+}
+
+.resume-section {
+  @apply mb-6;
+}
+
+.resume-section-title {
+  @apply text-lg font-bold border-b-2 border-purple-600 pb-2 mb-4;
+}
+
+/* Networking Cards */
+.networking-card {
+  @apply card hover:border-purple-500/30;
+}
+
+.networking-card:hover {
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.25);
+}
+
+/* Profile Optimization */
+.optimization-item {
+  @apply flex items-start gap-3 p-4 glass rounded-lg;
+}
+
+.optimization-priority-high {
+  @apply border-l-4 border-red-500;
+}
+
+.optimization-priority-medium {
+  @apply border-l-4 border-yellow-500;
+}
+
+.optimization-priority-low {
+  @apply border-l-4 border-green-500;
+}
+
+/* Progress Bars */
+.progress-bar {
+  @apply w-full bg-gray-700 rounded-full h-2 overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full bg-gradient-to-r from-purple-600 to-purple-500 transition-all duration-500;
+}
+
+/* Skeleton Loaders */
+.skeleton {
+  @apply animate-pulse bg-gray-700 rounded;
+}
+
+.skeleton-text {
+  @apply skeleton h-4 mb-2;
+}
+
+.skeleton-title {
+  @apply skeleton h-6 mb-4;
+}
+
+.skeleton-card {
+  @apply skeleton h-32 rounded-xl;
+}
