@@ -1,6 +1,6 @@
 // Resume routes for LinkedInScholar (FREE version with Groq AI)
 const express = require('express');
-const authMiddleware = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 const Resume = require('../models/Resume');
 const aiService = require('../services/aiService');
 const router = express.Router();
@@ -9,19 +9,23 @@ const router = express.Router();
  * Generate AI-powered resume (FREE with Groq API)
  * POST /api/resume/generate
  */
-router.post('/generate', authMiddleware, async (req, res) => {
+router.post('/generate', auth, async (req, res) => {
   try {
-    // Get user profile data
+    // Get profile data from request body or user object
+    const requestData = req.body.profileData || req.body;
+    
     const profileData = {
-      fullName: req.user.fullName,
-      email: req.user.email,
-      headline: req.user.linkedinProfile?.headline || 'Computer Science Student',
-      summary: req.user.linkedinProfile?.summary || '',
-      experience: req.user.linkedinProfile?.experience || [],
-      education: req.user.linkedinProfile?.education || [],
-      skills: req.user.linkedinProfile?.skills || [],
-      targetRole: req.body.targetRole || 'Software Developer',
-      ...req.body // Include any additional data from request
+      fullName: requestData.fullName || req.user.fullName,
+      email: requestData.email || req.user.email,
+      phone: requestData.phone || req.user.phone || '',
+      linkedin: requestData.linkedin || req.user.linkedinProfile?.url || '',
+      headline: requestData.headline || req.user.linkedinProfile?.headline || 'Professional',
+      summary: requestData.summary || req.user.linkedinProfile?.summary || '',
+      experience: requestData.experience || req.user.linkedinProfile?.experience || [],
+      education: requestData.education || req.user.linkedinProfile?.education || [],
+      skills: requestData.skills || req.user.linkedinProfile?.skills || { technical: [], soft: [] },
+      projects: requestData.projects || [],
+      targetRole: requestData.targetRole || req.body.targetRole || 'Software Developer'
     };
     
     console.log('Generating resume for:', profileData.fullName);
@@ -62,7 +66,7 @@ router.post('/generate', authMiddleware, async (req, res) => {
  * Get user's resume list
  * GET /api/resume/list
  */
-router.get('/list', authMiddleware, async (req, res) => {
+router.get('/list', auth, async (req, res) => {
   try {
     const resumes = await Resume.find({ userId: req.user._id })
       .sort({ createdAt: -1 })
@@ -87,7 +91,7 @@ router.get('/list', authMiddleware, async (req, res) => {
  * Get specific resume
  * GET /api/resume/:id
  */
-router.get('/:id', authMiddleware, async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   try {
     const resume = await Resume.findOne({
       _id: req.params.id,
@@ -119,7 +123,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
  * Update resume
  * PUT /api/resume/:id
  */
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   try {
     const resume = await Resume.findOne({
       _id: req.params.id,
@@ -157,7 +161,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
  * Delete resume
  * DELETE /api/resume/:id
  */
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     const resume = await Resume.findOneAndDelete({
       _id: req.params.id,
@@ -188,7 +192,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
  * Regenerate resume with new parameters
  * POST /api/resume/:id/regenerate
  */
-router.post('/:id/regenerate', authMiddleware, async (req, res) => {
+router.post('/:id/regenerate', auth, async (req, res) => {
   try {
     const existingResume = await Resume.findOne({
       _id: req.params.id,
@@ -245,7 +249,7 @@ router.post('/:id/regenerate', authMiddleware, async (req, res) => {
  * Download resume as PDF (placeholder for future implementation)
  * GET /api/resume/:id/download
  */
-router.get('/:id/download', authMiddleware, async (req, res) => {
+router.get('/:id/download', auth, async (req, res) => {
   try {
     const resume = await Resume.findOne({
       _id: req.params.id,
