@@ -19,6 +19,7 @@ router.post('/generate', auth, async (req, res) => {
       email: requestData.email || req.user.email,
       phone: requestData.phone || req.user.phone || '',
       linkedin: requestData.linkedin || req.user.linkedinProfile?.url || '',
+      country: requestData.country || 'global', // New: Country selection for global optimization
       headline: requestData.headline || req.user.linkedinProfile?.headline || 'Professional',
       summary: requestData.summary || req.user.linkedinProfile?.summary || '',
       experience: requestData.experience || req.user.linkedinProfile?.experience || [],

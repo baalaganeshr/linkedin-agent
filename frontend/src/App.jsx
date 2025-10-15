@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -11,7 +11,6 @@ import AuthCallback from './pages/AuthCallback';
 import ResumePage from './pages/ResumePage';
 import ProfilePage from './pages/ProfilePage';
 import NetworkingPage from './pages/NetworkingPage';
-import UpgradePage from './pages/UpgradePage';
 import UpgradePage from './pages/UpgradePage';
 
 // Components

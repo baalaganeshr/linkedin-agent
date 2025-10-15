@@ -15,6 +15,7 @@ export default function ResumeGenerator() {
     email: '',
     phone: '',
     linkedin: '',
+    country: 'global', // Default to global
     headline: '',
     summary: '',
     education: [{ institution: '', degree: '', field: '', duration: '', gpa: '' }],
@@ -187,6 +188,53 @@ export default function ResumeGenerator() {
               onChange={(e) => handleInputChange('linkedin', e.target.value)}
               placeholder="linkedin.com/in/johndoe"
             />
+            
+            {/* Country Selector */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: 500,
+                color: '#A0A0A0',
+                marginBottom: '8px'
+              }}>
+                🌍 Target Country/Region
+              </label>
+              <select
+                value={formData.country}
+                onChange={(e) => handleInputChange('country', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: '#1A1A1A',
+                  border: '1px solid #333333',
+                  borderRadius: '8px',
+                  color: '#FFFFFF',
+                  fontSize: '14px',
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                  cursor: 'pointer'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#8B5CF6'}
+                onBlur={(e) => e.target.style.borderColor = '#333333'}
+              >
+                <option value="global">🌍 Global/International</option>
+                <option value="US">🇺🇸 United States</option>
+                <option value="UK">🇬🇧 United Kingdom</option>
+                <option value="CA">🇨🇦 Canada</option>
+                <option value="AU">🇦🇺 Australia</option>
+                <option value="DE">🇩🇪 Germany</option>
+                <option value="FR">🇫🇷 France</option>
+                <option value="IN">🇮🇳 India</option>
+                <option value="SG">🇸🇬 Singapore</option>
+                <option value="NL">🇳🇱 Netherlands</option>
+                <option value="SE">🇸🇪 Sweden</option>
+                <option value="CH">🇨🇭 Switzerland</option>
+                <option value="NO">🇳🇴 Norway</option>
+                <option value="DK">🇩🇰 Denmark</option>
+                <option value="FI">🇫🇮 Finland</option>
+              </select>
+            </div>
           </FormSection>
 
           {/* Professional Summary */}

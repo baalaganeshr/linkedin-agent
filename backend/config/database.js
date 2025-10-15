@@ -1,57 +1,53 @@
-// Database connection configuration with error handling and retry logic
+// Enhanced database connection with retry logic and monitoring
 const mongoose = require('mongoose');
+const logger = require('./logger');
+
+let retryCount = 0;
+const MAX_RETRIES = 5;
 
 const connectDB = async () => {
   try {
-    // Connection options for production-ready setup
     const options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      maxPoolSize: 10, // Maintain up to 10 socket connections
-      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-      family: 4, // Use IPv4, skip trying IPv6
-      retryWrites: true,
-      writeConcern: {
-        w: 'majority',
-        j: true,
-        wtimeout: 1000
-      }
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      family: 4
     };
 
     const conn = await mongoose.connect(process.env.MONGODB_URI, options);
 
-    console.log(`🗄️  MongoDB Connected: ${conn.connection.host}`);
-    console.log(`📊 Database: ${conn.connection.name}`);
-
-    // Connection event listeners
-    mongoose.connection.on('connected', () => {
-      console.log('✅ Mongoose connected to MongoDB');
-    });
+    logger.info(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`  MongoDB Connected: ${conn.connection.host}`);
+    console.log(` Database: ${conn.connection.name}`);
+    
+    retryCount = 0;
 
     mongoose.connection.on('error', (err) => {
-      console.error('❌ Mongoose connection error:', err);
+      logger.error('Mongoose connection error:', err);
     });
 
     mongoose.connection.on('disconnected', () => {
-      console.log('⚠️ Mongoose disconnected from MongoDB');
+      logger.warn('Mongoose disconnected');
+      if (retryCount < MAX_RETRIES) {
+        retryCount++;
+        setTimeout(connectDB, 5000);
+      }
     });
 
-    // Graceful shutdown
-    process.on('SIGINT', async () => {
+    process.on('SIGTERM', async () => {
       await mongoose.connection.close();
-      console.log('🛑 MongoDB connection closed through app termination');
       process.exit(0);
     });
 
   } catch (error) {
-    console.error('❌ Database connection failed:', error.message);
-    
-    // Retry connection after 5 seconds
-    setTimeout(() => {
-      console.log('🔄 Retrying database connection...');
-      connectDB();
-    }, 5000);
+    logger.error('Database connection failed:', error);
+    if (retryCount < MAX_RETRIES) {
+      retryCount++;
+      console.log(` Retrying database connection (${retryCount}/${MAX_RETRIES})...`);
+      setTimeout(connectDB, 5000);
+    } else {
+      process.exit(1);
+    }
   }
 };
 

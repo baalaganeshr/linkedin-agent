@@ -1,6 +1,6 @@
 // Profile optimization routes for LinkedInScholar (FREE version with Groq AI)
 const express = require('express');
-const authMiddleware = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 const User = require('../models/User');
 const aiService = require('../services/aiService');
 const router = express.Router();
@@ -9,7 +9,7 @@ const router = express.Router();
  * Analyze LinkedIn profile and get optimization suggestions (FREE with Groq AI)
  * POST /api/profile/analyze
  */
-router.post('/analyze', authMiddleware, async (req, res) => {
+router.post('/analyze', auth, async (req, res) => {
   try {
     const { linkedinUrl, profileData } = req.body;
     
@@ -60,7 +60,7 @@ router.post('/analyze', authMiddleware, async (req, res) => {
  * Get profile optimization history
  * GET /api/profile/optimizations
  */
-router.get('/optimizations', authMiddleware, async (req, res) => {
+router.get('/optimizations', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('lastProfileAnalysis');
     
@@ -93,7 +93,7 @@ router.get('/optimizations', authMiddleware, async (req, res) => {
  * Update LinkedIn profile data
  * PUT /api/profile/update
  */
-router.put('/update', authMiddleware, async (req, res) => {
+router.put('/update', auth, async (req, res) => {
   try {
     const { headline, summary, experience, education, skills, linkedinUrl } = req.body;
     
@@ -132,7 +132,7 @@ router.put('/update', authMiddleware, async (req, res) => {
  * Get profile improvement suggestions based on target role
  * POST /api/profile/suggestions
  */
-router.post('/suggestions', authMiddleware, async (req, res) => {
+router.post('/suggestions', auth, async (req, res) => {
   try {
     const { targetRole, targetIndustry, currentLevel } = req.body;
     
@@ -175,7 +175,7 @@ router.post('/suggestions', authMiddleware, async (req, res) => {
  * Compare profile with industry standards
  * POST /api/profile/benchmark
  */
-router.post('/benchmark', authMiddleware, async (req, res) => {
+router.post('/benchmark', auth, async (req, res) => {
   try {
     const { industry, experience_level } = req.body;
     
@@ -226,7 +226,7 @@ router.post('/benchmark', authMiddleware, async (req, res) => {
  * Get profile optimization checklist
  * GET /api/profile/checklist
  */
-router.get('/checklist', authMiddleware, async (req, res) => {
+router.get('/checklist', auth, async (req, res) => {
   try {
     // Generate a comprehensive checklist for profile optimization
     const checklist = {

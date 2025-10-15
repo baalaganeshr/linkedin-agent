@@ -1,6 +1,6 @@
 // Networking routes for LinkedInScholar (FREE version with Groq AI)
 const express = require('express');
-const authMiddleware = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 const NetworkingSuggestion = require('../models/NetworkingSuggestion');
 const aiService = require('../services/aiService');
 const router = express.Router();
@@ -9,7 +9,7 @@ const router = express.Router();
  * Get networking suggestions (FREE with Groq AI)
  * GET /api/networking/suggestions
  */
-router.get('/suggestions', authMiddleware, async (req, res) => {
+router.get('/suggestions', auth, async (req, res) => {
   try {
     const { targetRole, industry, location } = req.query;
     
@@ -65,7 +65,7 @@ router.get('/suggestions', authMiddleware, async (req, res) => {
  * Generate personalized connection message (FREE with Groq AI)
  * POST /api/networking/message
  */
-router.post('/message', authMiddleware, async (req, res) => {
+router.post('/message', auth, async (req, res) => {
   try {
     const { targetName, targetRole, targetCompany, context, messageType } = req.body;
     
@@ -134,7 +134,7 @@ router.post('/message', authMiddleware, async (req, res) => {
  * Get networking history
  * GET /api/networking/history
  */
-router.get('/history', authMiddleware, async (req, res) => {
+router.get('/history', auth, async (req, res) => {
   try {
     const history = await NetworkingSuggestion.find({ userId: req.user._id })
       .sort({ generatedAt: -1 })
@@ -162,7 +162,7 @@ router.get('/history', authMiddleware, async (req, res) => {
  * Get networking action recommendations
  * POST /api/networking/actions
  */
-router.post('/actions', authMiddleware, async (req, res) => {
+router.post('/actions', auth, async (req, res) => {
   try {
     const { currentConnections, targetIndustry, careerLevel } = req.body;
     
@@ -270,7 +270,7 @@ router.post('/actions', authMiddleware, async (req, res) => {
  * Find networking events and opportunities
  * GET /api/networking/events
  */
-router.get('/events', authMiddleware, async (req, res) => {
+router.get('/events', auth, async (req, res) => {
   try {
     const { location, industry } = req.query;
     
@@ -373,7 +373,7 @@ router.get('/events', authMiddleware, async (req, res) => {
  * Track networking progress
  * POST /api/networking/track
  */
-router.post('/track', authMiddleware, async (req, res) => {
+router.post('/track', auth, async (req, res) => {
   try {
     const { action, result, notes, connectionName, companyName } = req.body;
     
