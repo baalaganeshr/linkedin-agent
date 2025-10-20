@@ -17,14 +17,17 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: process.env.NODE_ENV !== 'production', // Only in development
+    minify: 'terser', // Better minification than esbuild
+    target: 'esnext',
+    chunkSizeWarningLimit: 1000, // Warn for chunks > 1MB
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          motion: ['framer-motion'],
-          icons: ['lucide-react'],
+          ui: ['framer-motion', 'lucide-react'],
+          monitoring: ['@sentry/react']
         }
       }
     }
