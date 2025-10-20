@@ -10,13 +10,15 @@ const compression = require('compression');
 const morgan = require('morgan');
 const apicache = require('apicache');
 const dotenv = require('dotenv');
+
+// Load and validate environment variables FIRST
+dotenv.config();
+const config = require('./config/validateEnv')();
+
 const connectDB = require('./config/database');
 const logger = require('./config/logger');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
 const { sanitizeInput } = require('./middleware/validation');
-
-// Load environment variables
-dotenv.config();
 
 // Connect to MongoDB
 connectDB();
@@ -102,26 +104,93 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Input sanitization middleware
 app.use(sanitizeInput);
 
-// Health check endpoint (cached for 5 minutes)
-app.get('/api/health', cache('5 minutes'), (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'LinkedInScholar API - 100% FREE VERSION ⚡',
-    version: '2.0-FREE',
-    ai: 'Groq (FREE - 14,400 requests/day)',
-    database: 'MongoDB Atlas (FREE - 512MB)',
-    hosting: 'Render (FREE)',
-    cost: '₹0 per month',
+// Enhanced health check endpoint with comprehensive system status
+app.get('/api/health', async (req, res) => {
+  const startTime = Date.now();
+  
+  const health = {
+    status: 'healthy',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    features: [
-      'Unlimited Resume Generation',
-      'Unlimited Profile Optimization', 
-      'Unlimited Networking Suggestions',
-      'LinkedIn OAuth Integration',
-      'No Premium Plans - Everything FREE!'
-    ]
-  });
+    uptime: process.uptime(),
+    environment: config.NODE_ENV,
+    version: '2.0-FREE',
+    memory: {
+      used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+      total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+      external: Math.round(process.memoryUsage().external / 1024 / 1024),
+      unit: 'MB'
+    },
+    checks: {},
+    performance: {}
+  };
+
+  // Database connectivity check
+  try {
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState === 1) {
+      const dbStartTime = Date.now();
+      await mongoose.connection.db.admin().ping();
+      health.checks.database = {
+        status: 'healthy',
+        responseTime: Date.now() - dbStartTime,
+        connection: 'connected'
+      };
+    } else {
+      health.checks.database = {
+        status: 'unhealthy',
+        connection: 'disconnected'
+      };
+      health.status = 'degraded';
+    }
+  } catch (error) {
+    health.checks.database = {
+      status: 'unhealthy',
+      error: error.message,
+      connection: 'error'
+    };
+    health.status = 'degraded';
+  }
+
+  // AI Service availability check
+  try {
+    const aiService = require('./services/aiService');
+    const aiStartTime = Date.now();
+    
+    health.checks.ai = {
+      status: 'healthy',
+      provider: aiService.currentProvider?.name || 'unknown',
+      cost: aiService.currentProvider?.cost || 'unknown',
+      responseTime: Date.now() - aiStartTime,
+      providers: aiService.providers ? Object.keys(aiService.providers) : []
+    };
+  } catch (error) {
+    health.checks.ai = {
+      status: 'unhealthy',
+      error: error.message
+    };
+    health.status = 'degraded';
+  }
+
+  // System performance metrics
+  health.performance = {
+    totalResponseTime: Date.now() - startTime,
+    nodeVersion: process.version,
+    platform: process.platform,
+    arch: process.arch
+  };
+
+  // Features available
+  health.features = [
+    'Unlimited Resume Generation',
+    'Unlimited Profile Optimization', 
+    'Unlimited Networking Suggestions',
+    'LinkedIn OAuth Integration',
+    'No Premium Plans - Everything FREE!'
+  ];
+
+  // Return appropriate status code
+  const statusCode = health.status === 'healthy' ? 200 : 503;
+  res.status(statusCode).json(health);
 });
 
 // API Routes - 100% FREE VERSION using Ollama AI

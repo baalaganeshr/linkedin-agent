@@ -224,6 +224,30 @@ const requireAdmin = async (req, res, next) => {
 // Rate limiting per user
 const userRateLimit = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
   const userRequests = new Map();
+  
+  // Cleanup interval to prevent memory leaks
+  const cleanupInterval = setInterval(() => {
+    const now = Date.now();
+    const windowStart = now - windowMs;
+    
+    for (const [userId, requests] of userRequests.entries()) {
+      const validRequests = requests.filter(time => time > windowStart);
+      if (validRequests.length === 0) {
+        userRequests.delete(userId);
+      } else {
+        userRequests.set(userId, validRequests);
+      }
+    }
+  }, Math.min(windowMs / 4, 60000)); // Clean every quarter window or 1 minute max
+
+  // Graceful cleanup on process termination
+  const cleanup = () => {
+    clearInterval(cleanupInterval);
+    userRequests.clear();
+  };
+
+  process.on('SIGINT', cleanup);
+  process.on('SIGTERM', cleanup);
 
   return (req, res, next) => {
     if (!req.user) {
@@ -234,15 +258,18 @@ const userRateLimit = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
     const now = Date.now();
     const windowStart = now - windowMs;
 
-    // Clean old entries
+    // Clean old entries for this user
     if (userRequests.has(userId)) {
       const userReqs = userRequests.get(userId);
-      userRequests.set(userId, userReqs.filter(time => time > windowStart));
-    } else {
-      userRequests.set(userId, []);
+      const validReqs = userReqs.filter(time => time > windowStart);
+      if (validReqs.length === 0) {
+        userRequests.delete(userId);
+      } else {
+        userRequests.set(userId, validReqs);
+      }
     }
 
-    const userReqs = userRequests.get(userId);
+    const userReqs = userRequests.get(userId) || [];
 
     if (userReqs.length >= maxRequests) {
       return res.status(429).json({
@@ -254,6 +281,7 @@ const userRateLimit = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
     }
 
     userReqs.push(now);
+    userRequests.set(userId, userReqs);
     next();
   };
 };
