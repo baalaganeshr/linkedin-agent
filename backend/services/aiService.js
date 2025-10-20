@@ -37,7 +37,9 @@ class AIService {
     }
     
     // 2. Ollama (LOCAL - Completely FREE)
-    if (process.env.OLLAMA_HOST || this.checkOllamaLocal()) {
+    // Note: checkOllamaLocal is now async, but called synchronously here for constructor
+    // Ollama detection primarily relies on OLLAMA_HOST env variable
+    if (process.env.OLLAMA_HOST) {
       providers.push({
         name: 'Ollama',
         type: 'local',
@@ -116,11 +118,15 @@ class AIService {
   /**
    * Check if Ollama is running locally
    */
-  checkOllamaLocal() {
+  async checkOllamaLocal() {
     try {
-      // This would need to be async in real implementation
-      return false; // For now, require explicit OLLAMA_HOST
-    } catch {
+      const response = await axios.get('http://localhost:11434/api/version', {
+        timeout: 2000 // 2 second timeout
+      });
+      console.log('✅ Ollama detected locally:', response.data);
+      return true;
+    } catch (error) {
+      console.log('❌ Ollama not available locally:', error.message);
       return false;
     }
   }

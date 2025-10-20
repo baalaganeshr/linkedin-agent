@@ -8,6 +8,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 const compression = require('compression');
 const morgan = require('morgan');
+const apicache = require('apicache');
 const dotenv = require('dotenv');
 const connectDB = require('./config/database');
 const logger = require('./config/logger');
@@ -56,6 +57,9 @@ app.use(hpp({
 // Compression middleware
 app.use(compression());
 
+// API caching middleware
+const cache = apicache.middleware;
+
 // Rate limiting - Enhanced with multiple windows
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -84,7 +88,7 @@ const aiLimiter = rateLimit({
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
   credentials: true
@@ -98,8 +102,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Input sanitization middleware
 app.use(sanitizeInput);
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
+// Health check endpoint (cached for 5 minutes)
+app.get('/api/health', cache('5 minutes'), (req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'LinkedInScholar API - 100% FREE VERSION ⚡',
@@ -125,6 +129,23 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/resume', aiLimiter, require('./routes/resume_free'));
 app.use('/api/profile', aiLimiter, require('./routes/profile_free'));
 app.use('/api/networking', aiLimiter, require('./routes/networking_free'));
+
+// Rate limiting for test routes (prevent abuse even in development)
+const testLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 20, // 20 requests per 5 minutes
+  message: {
+    error: 'Too many test requests. Please try again in 5 minutes.',
+    retryAfter: '5 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// TEST Routes (NO AUTH - for development/testing)
+app.use('/api/resume-test', testLimiter, require('./routes/resume_test'));
+app.use('/api/profile-test', testLimiter, require('./routes/profile_test'));
+app.use('/api/networking-test', testLimiter, require('./routes/networking_test'));
 
 // 404 handler
 app.use(notFound);
@@ -170,7 +191,7 @@ const server = app.listen(PORT, () => {
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🚀 LinkedInScholar Server running on port ${PORT}`);
   console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
   console.log(`🔒 Security: Enhanced with Helmet, Rate Limiting, Sanitization`);
   console.log(`📊 Logging: Winston + Morgan`);
 });
