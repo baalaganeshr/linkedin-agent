@@ -3,6 +3,7 @@ const express = require('express');
 const { auth } = require('../middleware/auth');
 const User = require('../models/User');
 const aiService = require('../services/aiService');
+const logger = require('../config/logger');
 const router = express.Router();
 
 /**
@@ -23,7 +24,7 @@ router.post('/analyze', auth, async (req, res) => {
       skills: []
     };
     
-    console.log('Analyzing profile for:', profileToAnalyze.fullName || req.user.fullName);
+    logger.info('Analyzing profile', { userId: req.user.id });
     
     // Get optimization suggestions using FREE Groq AI
     const optimization = await aiService.optimizeProfile(profileToAnalyze);
@@ -46,7 +47,7 @@ router.post('/analyze', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Profile analysis error:', error);
+    logger.error('Profile analysis error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to analyze profile',
@@ -81,7 +82,7 @@ router.get('/optimizations', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Profile optimization history error:', error);
+    logger.error('Profile optimization history error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to fetch optimization history'
@@ -120,7 +121,7 @@ router.put('/update', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Profile update error:', error);
+    logger.error('Profile update error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to update profile'
@@ -162,7 +163,7 @@ router.post('/suggestions', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Profile suggestions error:', error);
+    logger.error('Profile suggestions error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to generate profile suggestions',
@@ -213,7 +214,7 @@ router.post('/benchmark', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Profile benchmarking error:', error);
+    logger.error('Profile benchmarking error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to benchmark profile',
@@ -285,7 +286,7 @@ router.get('/checklist', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Profile checklist error:', error);
+    logger.error('Profile checklist error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to generate profile checklist'

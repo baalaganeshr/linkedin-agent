@@ -1,6 +1,7 @@
 // Authentication middleware for LinkedInScholar
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const logger = require('../config/logger');
 
 // Verify JWT token middleware
 const auth = async (req, res, next) => {
@@ -69,7 +70,7 @@ const auth = async (req, res, next) => {
     }
 
   } catch (error) {
-    console.error('Auth middleware error:', error);
+    logger.error('Auth middleware error:', error);
     return res.status(500).json({
       status: 'error',
       message: 'Authentication error occurred'
@@ -98,7 +99,7 @@ const requirePremium = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error('Premium middleware error:', error);
+    logger.error('Premium middleware error:', error);
     return res.status(500).json({
       status: 'error',
       message: 'Premium check failed'
@@ -145,7 +146,7 @@ const checkUsageLimit = (featureType, limit = null) => {
 
       next();
     } catch (error) {
-      console.error('Usage limit middleware error:', error);
+      logger.error('Usage limit middleware error:', error);
       return res.status(500).json({
         status: 'error',
         message: 'Usage limit check failed'
@@ -187,7 +188,7 @@ const optionalAuth = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error('Optional auth middleware error:', error);
+    logger.error('Optional auth middleware error:', error);
     req.user = null;
     next();
   }
@@ -213,7 +214,7 @@ const requireAdmin = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error('Admin middleware error:', error);
+    logger.error('Admin middleware error:', error);
     return res.status(500).json({
       status: 'error',
       message: 'Admin check failed'

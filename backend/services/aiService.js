@@ -1,6 +1,7 @@
 // Multi-Provider AI Service for LinkedInScholar - OPEN SOURCE & FLEXIBLE!
 // Supports: Groq (FREE), Ollama (LOCAL), OpenAI (PAID), Google Gemini (FREE), Anthropic, Hugging Face
 const axios = require('axios');
+const logger = require('../config/logger');
 
 class AIService {
   constructor() {
@@ -8,8 +9,8 @@ class AIService {
     this.providers = this.detectAvailableProviders();
     this.currentProvider = this.selectBestProvider();
     
-    console.log(`🤖 AI Service initialized with: ${this.currentProvider.name}`);
-    console.log(`💰 Cost: ${this.currentProvider.cost}`);
+    logger.info(`AI Service initialized with: ${this.currentProvider.name}`);
+    logger.info(`Cost: ${this.currentProvider.cost}`);
     
     // Initialize the selected provider
     this.initializeProvider();
@@ -123,10 +124,10 @@ class AIService {
       const response = await axios.get('http://localhost:11434/api/version', {
         timeout: 2000 // 2 second timeout
       });
-      console.log('✅ Ollama detected locally:', response.data);
+      logger.info('Ollama detected locally:', response.data);
       return true;
     } catch (error) {
-      console.log('❌ Ollama not available locally:', error.message);
+      logger.debug('Ollama not available locally:', error.message);
       return false;
     }
   }
@@ -358,12 +359,12 @@ Return ONLY valid JSON with this exact structure:
 }`;
 
     try {
-      console.log(`🤖 Generating resume using ${this.currentProvider.name}...`);
+      logger.info(`Generating resume using ${this.currentProvider.name}`);
       return await this.callAIProvider(prompt, 'resume');
       
     } catch (error) {
-      console.error(`❌ ${this.currentProvider.name} failed:`, error.message);
-      console.log('🔄 Trying fallback method...');
+      logger.error(`${this.currentProvider.name} failed:`, error.message);
+      logger.info('Trying fallback method...');
       return this.getFallbackResume(profileData);
     }
   }
@@ -537,7 +538,7 @@ Return JSON with structure:
       return JSON.parse(jsonMatch[0]);
       
     } catch (error) {
-      console.error('Groq AI Profile Optimization Error:', error);
+      logger.error('Groq AI Profile Optimization Error:', error);
       return this.getFallbackProfileOptimization();
     }
   }
@@ -616,7 +617,7 @@ Return JSON:
       return JSON.parse(jsonMatch[0]);
       
     } catch (error) {
-      console.error('Groq AI Networking Error:', error);
+      logger.error('Groq AI Networking Error:', error);
       return this.getFallbackNetworkingSuggestions();
     }
   }
@@ -677,7 +678,7 @@ Generate 3 different message options:
       return JSON.parse(jsonMatch[0]);
       
     } catch (error) {
-      console.error('Groq AI Message Generation Error:', error);
+      logger.error('Groq AI Message Generation Error:', error);
       return this.getFallbackConnectionMessages();
     }
   }

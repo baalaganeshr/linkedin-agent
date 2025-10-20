@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 const aiService = require('../services/aiService');
 const User = require('../models/User');
 const { auth, checkUsageLimit } = require('../middleware/auth');
+const logger = require('../config/logger');
 
 const router = express.Router();
 
@@ -77,7 +78,7 @@ router.post('/optimize', [
     });
 
   } catch (error) {
-    console.error('Profile optimization error:', error);
+    logger.error('Profile optimization error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to optimize profile',
@@ -184,7 +185,7 @@ router.get('/analysis', auth, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Profile analysis error:', error);
+    logger.error('Profile analysis error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to analyze profile'
@@ -266,7 +267,7 @@ router.post('/headline-suggestions', [
     });
 
   } catch (error) {
-    console.error('Headline suggestions error:', error);
+    logger.error('Headline suggestions error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to generate headline suggestions'
@@ -373,7 +374,7 @@ router.post('/summary-template', [
     });
 
   } catch (error) {
-    console.error('Summary template error:', error);
+    logger.error('Summary template error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to generate summary template'

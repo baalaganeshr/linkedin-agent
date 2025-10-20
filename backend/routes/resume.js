@@ -5,6 +5,7 @@ const aiService = require('../services/aiService');
 const Resume = require('../models/Resume');
 const User = require('../models/User');
 const { auth, checkUsageLimit } = require('../middleware/auth');
+const logger = require('../config/logger');
 
 const router = express.Router();
 
@@ -126,7 +127,7 @@ router.post('/generate', [
     });
 
   } catch (error) {
-    console.error('Resume generation error:', error);
+    logger.error('Resume generation error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to generate resume',
@@ -168,7 +169,7 @@ router.get('/list', auth, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Resume list error:', error);
+    logger.error('Resume list error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch resumes'
@@ -214,7 +215,7 @@ router.get('/:id', [
     });
 
   } catch (error) {
-    console.error('Resume fetch error:', error);
+    logger.error('Resume fetch error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch resume'
@@ -281,7 +282,7 @@ router.put('/:id', [
     });
 
   } catch (error) {
-    console.error('Resume update error:', error);
+    logger.error('Resume update error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to update resume'
@@ -328,7 +329,7 @@ router.delete('/:id', [
     });
 
   } catch (error) {
-    console.error('Resume deletion error:', error);
+    logger.error('Resume deletion error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to delete resume'
@@ -392,7 +393,7 @@ router.post('/:id/duplicate', [
     });
 
   } catch (error) {
-    console.error('Resume duplication error:', error);
+    logger.error('Resume duplication error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to duplicate resume'
@@ -455,7 +456,7 @@ router.get('/:id/export/:format', [
     });
 
   } catch (error) {
-    console.error('Resume export error:', error);
+    logger.error('Resume export error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to export resume'
@@ -505,7 +506,7 @@ router.get('/analytics/overview', auth, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Resume analytics error:', error);
+    logger.error('Resume analytics error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch analytics'

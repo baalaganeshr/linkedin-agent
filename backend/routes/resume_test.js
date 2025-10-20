@@ -2,6 +2,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const aiService = require('../services/aiService');
+const logger = require('../config/logger');
 const router = express.Router();
 
 // Validation middleware
@@ -45,9 +46,14 @@ router.post('/generate', validateResumeInput, async (req, res) => {
       projects: req.body.projects || []
     };
     
-    console.log('🚀 Generating resume for:', profileData.fullName);
-    console.log('📍 Country:', profileData.country);
-    console.log('💼 Target Role:', profileData.targetRole);
+    // Log request without PII
+    logger.info('Resume generation request', {
+      targetRole: profileData.targetRole,
+      country: profileData.country,
+      hasExperience: profileData.experience?.length > 0,
+      hasEducation: profileData.education?.length > 0,
+      hasProjects: profileData.projects?.length > 0
+    });
     
     // Generate resume using AI
     const resumeContent = await aiService.generateResume(profileData);
@@ -61,7 +67,7 @@ router.post('/generate', validateResumeInput, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Resume generation error:', error);
+    logger.error('Resume generation error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to generate resume',

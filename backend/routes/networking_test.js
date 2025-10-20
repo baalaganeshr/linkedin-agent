@@ -2,6 +2,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const aiService = require('../services/aiService');
+const logger = require('../config/logger');
 const router = express.Router();
 
 // Validation middleware
@@ -47,10 +48,14 @@ router.post('/suggestions', validateNetworkingInput, async (req, res) => {
       experience: req.body.experience || []
     };
     
-    console.log('🚀 Generating networking suggestions for:', userProfile.fullName);
-    console.log('🎯 Target Role:', userProfile.targetRole);
-    console.log('🏢 Industry:', userProfile.targetIndustry);
-    console.log('📍 Location:', userProfile.location);
+    // Log request without PII
+    logger.info('Networking suggestions request', {
+      targetRole: userProfile.targetRole,
+      targetIndustry: userProfile.targetIndustry,
+      location: userProfile.location,
+      experienceCount: userProfile.experience?.length || 0,
+      skillsCount: userProfile.skills?.length || 0
+    });
     
     // Generate networking suggestions using AI
     const suggestions = await aiService.generateNetworkingSuggestions(
@@ -67,7 +72,7 @@ router.post('/suggestions', validateNetworkingInput, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Networking suggestions error:', error);
+    logger.error('Networking suggestions error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to generate networking suggestions',
@@ -106,7 +111,13 @@ router.post('/message', validateMessageInput, async (req, res) => {
     
     const context = req.body.context || 'general networking';
     
-    console.log(`🚀 Generating message from ${userProfile.fullName} to ${targetProfile.name}`);
+    // Log request without PII
+    logger.info('Connection message generation request', {
+      targetRole: targetProfile.role,
+      targetCompany: targetProfile.company,
+      context: context,
+      hasUserProfile: !!userProfile.fullName
+    });
     
     // Generate connection message using AI
     const messages = await aiService.generateConnectionMessage(
@@ -124,7 +135,7 @@ router.post('/message', validateMessageInput, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Message generation error:', error);
+    logger.error('Message generation error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to generate message',

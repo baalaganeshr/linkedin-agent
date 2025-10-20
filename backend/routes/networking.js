@@ -5,6 +5,7 @@ const aiService = require('../services/aiService');
 const NetworkingSuggestion = require('../models/NetworkingSuggestion');
 const User = require('../models/User');
 const { auth, checkUsageLimit } = require('../middleware/auth');
+const logger = require('../config/logger');
 
 const router = express.Router();
 
@@ -122,7 +123,7 @@ router.post('/suggestions', [
     });
 
   } catch (error) {
-    console.error('Networking suggestions error:', error);
+    logger.error('Networking suggestions error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to generate networking suggestions',
@@ -185,7 +186,7 @@ router.get('/suggestions', auth, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Get networking suggestions error:', error);
+    logger.error('Get networking suggestions error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch networking suggestions'
@@ -230,7 +231,7 @@ router.get('/suggestions/:id', [
     });
 
   } catch (error) {
-    console.error('Get networking suggestion error:', error);
+    logger.error('Get networking suggestion error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch networking suggestion'
@@ -292,7 +293,7 @@ router.post('/suggestions/:id/action', [
     });
 
   } catch (error) {
-    console.error('Record networking action error:', error);
+    logger.error('Record networking action error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to record action'
@@ -346,7 +347,7 @@ router.post('/suggestions/:id/rate', [
     });
 
   } catch (error) {
-    console.error('Rate networking suggestion error:', error);
+    logger.error('Rate networking suggestion error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to submit rating'
@@ -401,7 +402,7 @@ router.post('/message-generator', [
     });
 
   } catch (error) {
-    console.error('Message generator error:', error);
+    logger.error('Message generator error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to generate connection message',
@@ -471,7 +472,7 @@ router.get('/analytics', auth, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Networking analytics error:', error);
+    logger.error('Networking analytics error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch networking analytics'
@@ -495,7 +496,7 @@ router.delete('/cleanup', auth, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Cleanup error:', error);
+    logger.error('Cleanup error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       status: 'error',
       message: 'Failed to cleanup expired suggestions'

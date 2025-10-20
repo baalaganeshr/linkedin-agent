@@ -40,7 +40,7 @@ router.get('/linkedin/authorize', (req, res) => {
       state
     });
   } catch (error) {
-    console.error('LinkedIn auth URL generation error:', error);
+    logger.error('LinkedIn auth URL generation error', { error: error.message });
     res.status(500).json({
       status: 'error',
       message: 'Failed to generate authorization URL'
@@ -159,7 +159,7 @@ router.get('/linkedin/callback', async (req, res) => {
     }))}`);
 
   } catch (error) {
-    console.error('LinkedIn callback error:', error);
+    logger.error('LinkedIn callback error', { error: error.message });
     res.redirect(`${process.env.FRONTEND_URL}/login?error=Authentication failed`);
   }
 });
@@ -204,7 +204,7 @@ router.get('/me', auth, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get profile error:', error);
+    logger.error('Get profile error', { error: error.message });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch user profile'
@@ -262,7 +262,7 @@ router.put('/profile', [
     });
 
   } catch (error) {
-    console.error('Profile update error:', error);
+    logger.error('Profile update error', { error: error.message });
     res.status(500).json({
       status: 'error',
       message: 'Failed to update profile'
@@ -285,7 +285,7 @@ router.post('/logout', auth, async (req, res) => {
       message: 'Logged out successfully'
     });
   } catch (error) {
-    console.error('Logout error:', error);
+    logger.error('Logout error', { error: error.message });
     res.status(500).json({
       status: 'error',
       message: 'Logout failed'
@@ -309,7 +309,7 @@ router.delete('/account', auth, async (req, res) => {
       message: 'Account deactivated successfully'
     });
   } catch (error) {
-    console.error('Account deletion error:', error);
+    logger.error('Account deletion error', { error: error.message });
     res.status(500).json({
       status: 'error',
       message: 'Failed to delete account'

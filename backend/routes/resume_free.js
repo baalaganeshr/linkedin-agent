@@ -3,6 +3,7 @@ const express = require('express');
 const { auth } = require('../middleware/auth');
 const Resume = require('../models/Resume');
 const aiService = require('../services/aiService');
+const logger = require('../config/logger');
 const router = express.Router();
 
 /**
@@ -29,7 +30,7 @@ router.post('/generate', auth, async (req, res) => {
       targetRole: requestData.targetRole || req.body.targetRole || 'Software Developer'
     };
     
-    console.log('Generating resume for:', profileData.fullName);
+    logger.info('Generating resume', { userId: req.user.id });
     
     // Generate resume using FREE Groq AI
     const resumeContent = await aiService.generateResume(profileData);
@@ -53,7 +54,7 @@ router.post('/generate', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Resume generation error:', error);
+    logger.error('Resume generation error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to generate resume',
@@ -80,7 +81,7 @@ router.get('/list', auth, async (req, res) => {
       aiPowered: 'Groq (FREE)'
     });
   } catch (error) {
-    console.error('Resume list error:', error);
+    logger.error('Resume list error', { error: error.message, userId: req.user?.id });
     res.status(500).json({ 
       success: false,
       error: 'Failed to fetch resumes' 
@@ -112,7 +113,7 @@ router.get('/:id', auth, async (req, res) => {
       aiPowered: resume.aiGenerated ? 'Groq (FREE)' : 'Manual'
     });
   } catch (error) {
-    console.error('Resume fetch error:', error);
+    logger.error('Resume fetch error', { error: error.message, userId: req.user?.id });
     res.status(500).json({ 
       success: false,
       error: 'Failed to fetch resume' 
@@ -150,7 +151,7 @@ router.put('/:id', auth, async (req, res) => {
       resume 
     });
   } catch (error) {
-    console.error('Resume update error:', error);
+    logger.error('Resume update error', { error: error.message, userId: req.user?.id });
     res.status(500).json({ 
       success: false,
       error: 'Failed to update resume' 
@@ -181,7 +182,7 @@ router.delete('/:id', auth, async (req, res) => {
       message: 'Resume deleted successfully' 
     });
   } catch (error) {
-    console.error('Resume delete error:', error);
+    logger.error('Resume delete error', { error: error.message, userId: req.user?.id });
     res.status(500).json({ 
       success: false,
       error: 'Failed to delete resume' 
@@ -237,7 +238,7 @@ router.post('/:id/regenerate', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Resume regeneration error:', error);
+    logger.error('Resume regeneration error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to regenerate resume',
@@ -278,7 +279,7 @@ router.get('/:id/download', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Resume download error:', error);
+    logger.error('Resume download error', { error: error.message, userId: req.user?.id });
     res.status(500).json({ 
       success: false,
       error: 'Failed to prepare resume for download' 

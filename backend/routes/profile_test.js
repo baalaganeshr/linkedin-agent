@@ -2,6 +2,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const aiService = require('../services/aiService');
+const logger = require('../config/logger');
 const router = express.Router();
 
 // Validation middleware
@@ -40,9 +41,14 @@ router.post('/optimize', validateProfileInput, async (req, res) => {
       skills: req.body.skills || []
     };
     
-    console.log('🚀 Optimizing profile for:', profileData.fullName);
-    console.log('🎯 Target Role:', profileData.targetRole);
-    console.log('📍 Country:', profileData.country);
+    // Log request without PII
+    logger.info('Profile optimization request', {
+      targetRole: profileData.targetRole,
+      country: profileData.country,
+      hasHeadline: !!profileData.headline,
+      hasSummary: !!profileData.summary,
+      skillsCount: profileData.skills?.length || 0
+    });
     
     // Get optimization suggestions using AI
     const optimization = await aiService.optimizeProfile(profileData);
@@ -55,7 +61,7 @@ router.post('/optimize', validateProfileInput, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Profile optimization error:', error);
+    logger.error('Profile optimization error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to optimize profile',

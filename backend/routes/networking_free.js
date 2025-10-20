@@ -3,6 +3,7 @@ const express = require('express');
 const { auth } = require('../middleware/auth');
 const NetworkingSuggestion = require('../models/NetworkingSuggestion');
 const aiService = require('../services/aiService');
+const logger = require('../config/logger');
 const router = express.Router();
 
 /**
@@ -22,7 +23,7 @@ router.get('/suggestions', auth, async (req, res) => {
       location: location || 'India'
     };
     
-    console.log('Generating networking suggestions for:', userProfile.fullName);
+    logger.info('Generating networking suggestions', { userId: req.user.id });
     
     // Generate networking suggestions using FREE Groq AI
     const suggestions = await aiService.generateNetworkingSuggestions(
@@ -51,7 +52,7 @@ router.get('/suggestions', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Networking suggestions error:', error);
+    logger.error('Networking suggestions error', { error: error.message, userId: req.user.id });
     res.status(500).json({
       success: false,
       error: 'Failed to generate networking suggestions',
@@ -91,7 +92,7 @@ router.post('/message', auth, async (req, res) => {
       company: targetCompany || 'Company'
     };
     
-    console.log(`Generating connection message from ${userProfile.fullName} to ${targetName}`);
+    logger.info('Generating connection message', { userId: req.user.id, hasTarget: !!targetName });
     
     // Generate personalized message using FREE Groq AI
     const connectionMessages = await aiService.generateConnectionMessage(
@@ -120,7 +121,7 @@ router.post('/message', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Connection message generation error:', error);
+    logger.error('Connection message generation error', { error: error.message, userId: req.user.id });
     res.status(500).json({
       success: false,
       error: 'Failed to generate connection message',
@@ -150,7 +151,7 @@ router.get('/history', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Networking history error:', error);
+    logger.error('Networking history error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to fetch networking history'
@@ -258,7 +259,7 @@ router.post('/actions', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Networking actions error:', error);
+    logger.error('Networking actions error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to generate networking actions'
@@ -361,7 +362,7 @@ router.get('/events', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Networking events error:', error);
+    logger.error('Networking events error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to fetch networking events'
@@ -434,7 +435,7 @@ router.post('/track', auth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Networking tracking error:', error);
+    logger.error('Networking tracking error', { error: error.message, userId: req.user?.id });
     res.status(500).json({
       success: false,
       error: 'Failed to track networking progress'

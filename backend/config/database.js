@@ -16,9 +16,10 @@ const connectDB = async () => {
 
     const conn = await mongoose.connect(process.env.MONGODB_URI, options);
 
-    logger.info(`MongoDB Connected: ${conn.connection.host}`);
-    console.log(`  MongoDB Connected: ${conn.connection.host}`);
-    console.log(` Database: ${conn.connection.name}`);
+    logger.info(`MongoDB Connected`, { 
+      host: conn.connection.host,
+      database: conn.connection.name
+    });
     
     retryCount = 0;
 
@@ -43,7 +44,7 @@ const connectDB = async () => {
     logger.error('Database connection failed:', error);
     if (retryCount < MAX_RETRIES) {
       retryCount++;
-      console.log(` Retrying database connection (${retryCount}/${MAX_RETRIES})...`);
+      logger.warn(`Retrying database connection`, { retry: retryCount, maxRetries: MAX_RETRIES });
       setTimeout(connectDB, 5000);
     } else {
       process.exit(1);
