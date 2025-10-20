@@ -1,6 +1,7 @@
 // API Service for frontend-backend communication
 import axios from 'axios';
 import { retryRequest, retryOnNetworkError } from '../utils/retry';
+import { captureException } from './sentry';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -59,6 +60,16 @@ api.interceptors.response.use(
       
       console.log(`Retrying request (attempt ${originalRequest._retryCount + 1}/3)...`);
       return api(originalRequest);
+    }
+
+    // Capture error in Sentry for 500+ errors (server issues)
+    if (error.response?.status >= 500) {
+      captureException(error, {
+        apiEndpoint: originalRequest.url,
+        method: originalRequest.method,
+        statusCode: error.response?.status,
+        component: 'api-service'
+      });
     }
 
     return Promise.reject(error);

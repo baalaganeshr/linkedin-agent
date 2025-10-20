@@ -1,5 +1,14 @@
 // LinkedInScholar Backend Server - Production Ready
 // Dark theme AI-powered LinkedIn guidance platform
+
+// Load environment variables FIRST
+const dotenv = require('dotenv');
+dotenv.config();
+
+// Initialize Sentry BEFORE other imports
+const { initSentry, sentryRequestHandler, sentryErrorHandler } = require('./config/sentry');
+initSentry();
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -9,10 +18,6 @@ const hpp = require('hpp');
 const compression = require('compression');
 const morgan = require('morgan');
 const apicache = require('apicache');
-const dotenv = require('dotenv');
-
-// Load and validate environment variables FIRST
-dotenv.config();
 const config = require('./config/validateEnv')();
 
 const connectDB = require('./config/database');
@@ -27,6 +32,9 @@ const app = express();
 
 // Trust proxy (for rate limiting behind reverse proxy)
 app.set('trust proxy', 1);
+
+// Sentry request handler MUST be first middleware
+app.use(sentryRequestHandler);
 
 // HTTP request logger
 if (process.env.NODE_ENV === 'development') {
@@ -218,6 +226,9 @@ app.use('/api/networking-test', testLimiter, require('./routes/networking_test')
 
 // 404 handler
 app.use(notFound);
+
+// Sentry error handler MUST be before other error handlers
+app.use(sentryErrorHandler);
 
 // Global error handler
 app.use(errorHandler);

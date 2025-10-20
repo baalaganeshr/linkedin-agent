@@ -16,11 +16,30 @@ import UpgradePage from './pages/UpgradePage';
 // Components
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
+import { SentryErrorBoundary } from './services/sentry';
 
 function App() {
   return (
-    <ErrorBoundary>
-      <AuthProvider>
+    <SentryErrorBoundary
+      fallback={({ error, resetError }) => (
+        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto p-6">
+            <h1 className="text-2xl font-bold text-red-400 mb-4">Something went wrong</h1>
+            <p className="text-gray-400 mb-6">
+              We've been notified about this error and will fix it soon.
+            </p>
+            <button
+              onClick={resetError}
+              className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg transition-colors"
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      )}
+    >
+      <ErrorBoundary>
+        <AuthProvider>
         <Router>
           <div className="min-h-screen bg-black text-white">
             {/* Main Routes */}
@@ -98,6 +117,7 @@ function App() {
         </Router>
       </AuthProvider>
     </ErrorBoundary>
+    </SentryErrorBoundary>
   );
 }
 

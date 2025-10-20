@@ -1,6 +1,7 @@
+import React from 'react';
 import { colors } from '../../styles/colors';
 
-export default function Input({ 
+const Input = React.memo(function Input({ 
   type = 'text',
   placeholder,
   value,
@@ -8,28 +9,41 @@ export default function Input({
   error,
   label,
   required = false,
-  disabled = false
+  disabled = false,
+  id,
+  ariaDescribedBy,
+  autoComplete
 }) {
+  const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+  const errorId = error ? `${inputId}-error` : undefined;
   return (
     <div style={{ width: '100%' }}>
       {label && (
-        <label style={{
-          display: 'block',
-          fontSize: '14px',
-          fontWeight: 500,
-          color: colors.text,
-          marginBottom: '6px'
-        }}>
+        <label 
+          htmlFor={inputId}
+          style={{
+            display: 'block',
+            fontSize: '14px',
+            fontWeight: 500,
+            color: colors.text,
+            marginBottom: '6px'
+          }}>
           {label}
-          {required && <span style={{ color: colors.error, marginLeft: '4px' }}>*</span>}
+          {required && <span style={{ color: colors.error, marginLeft: '4px' }} aria-label="required">*</span>}
         </label>
       )}
       <input
+        id={inputId}
         type={type}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
         disabled={disabled}
+        required={required}
+        autoComplete={autoComplete}
+        aria-invalid={!!error}
+        aria-describedby={[errorId, ariaDescribedBy].filter(Boolean).join(' ') || undefined}
+        aria-label={!label ? placeholder : undefined}
         style={{
           width: '100%',
           padding: '12px 16px',
@@ -56,17 +70,23 @@ export default function Input({
         }}
       />
       {error && (
-        <p style={{
-          color: colors.error,
-          fontSize: '13px',
-          marginTop: '6px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px'
-        }}>
-          ⚠️ {error}
+        <p 
+          id={errorId}
+          role="alert"
+          aria-live="polite"
+          style={{
+            color: colors.error,
+            fontSize: '13px',
+            marginTop: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
+          <span aria-hidden="true">⚠️</span> {error}
         </p>
       )}
     </div>
   );
-}
+});
+
+export default Input;

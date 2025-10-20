@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 
-const LoadingSpinner = ({ size = 'large', message = 'Loading...' }) => {
+const LoadingSpinner = React.memo(function LoadingSpinner({ size = 'large', message = 'Loading...' }) {
   const sizeClasses = {
     small: 'w-6 h-6',
     medium: 'w-8 h-8',
@@ -59,6 +59,6 @@ const LoadingSpinner = ({ size = 'large', message = 'Loading...' }) => {
       </div>
     </div>
   );
-};
+});
 
 export default LoadingSpinner;

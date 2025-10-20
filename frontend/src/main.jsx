@@ -1,9 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import AppFixed from './AppFixed.jsx'
+import { initSentry } from './services/sentry.js'
+import App from './App.jsx'
+
+// Initialize Sentry before rendering the app
+initSentry();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AppFixed />
+    <App />
   </React.StrictMode>,
 )

@@ -9,6 +9,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@sentry/node": "^10.20.0",
     "apicache": "^1.6.3",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",

@@ -120,7 +120,11 @@ const DashboardPage = () => {
               </div>
 
               {/* Settings */}
-              <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+              <button 
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                aria-label="Open settings"
+                type="button"
+              >
                 <Settings className="w-5 h-5 text-gray-400" />
               </button>
 
@@ -128,6 +132,8 @@ const DashboardPage = () => {
               <button 
                 onClick={handleLogout}
                 className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
+                aria-label="Sign out of your account"
+                type="button"
               >
                 <LogOut className="w-5 h-5 text-gray-400 hover:text-red-400" />
               </button>

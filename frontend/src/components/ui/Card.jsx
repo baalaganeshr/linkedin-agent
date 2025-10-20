@@ -1,11 +1,15 @@
+import React from 'react';
 import { colors } from '../../styles/colors';
 
-export default function Card({ 
+const Card = React.memo(function Card({ 
   children, 
   hover = false, 
   padding = '24px',
   onClick,
-  className = ''
+  className = '',
+  ariaLabel,
+  ariaDescribedBy,
+  role
 }) {
   const isClickable = !!onClick;
 
@@ -13,6 +17,16 @@ export default function Card({
     <div
       className={className}
       onClick={onClick}
+      role={role || (isClickable ? 'button' : undefined)}
+      tabIndex={isClickable ? 0 : undefined}
+      aria-label={ariaLabel}
+      aria-describedby={ariaDescribedBy}
+      onKeyDown={(e) => {
+        if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          onClick(e);
+        }
+      }}
       style={{
         background: colors.bgElevated,
         border: `1px solid ${colors.border}`,
@@ -37,4 +51,6 @@ export default function Card({
       {children}
     </div>
   );
-}
+});
+
+export default Card;

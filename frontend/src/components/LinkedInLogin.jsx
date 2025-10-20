@@ -27,6 +27,8 @@ export default function LinkedInLogin() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        role="main"
+        aria-labelledby="main-heading"
         style={{
           background: 'rgba(10, 10, 10, 0.6)',
           backdropFilter: 'blur(20px)',
@@ -37,17 +39,19 @@ export default function LinkedInLogin() {
           maxWidth: '400px'
         }}
       >
-        <h1 style={{
-          fontSize: '32px',
-          fontWeight: 'bold',
-          background: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          marginBottom: '16px'
-        }}>
+        <h1 
+          id="main-heading"
+          style={{
+            fontSize: '32px',
+            fontWeight: 'bold',
+            background: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: '16px'
+          }}>
           LinkedInScholar
         </h1>
-        <p style={{ color: '#9CA3AF', marginBottom: '32px' }}>
+        <p style={{ color: '#9CA3AF', marginBottom: '32px' }} role="text">
           AI-powered LinkedIn platform for college students
         </p>
         <motion.button
@@ -55,6 +59,9 @@ export default function LinkedInLogin() {
           whileTap={{ scale: 0.95 }}
           onClick={handleLogin}
           disabled={loading}
+          aria-label={loading ? 'Redirecting to LinkedIn authentication' : 'Sign in with LinkedIn'}
+          aria-disabled={loading}
+          type="button"
           style={{
             background: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
             color: 'white',

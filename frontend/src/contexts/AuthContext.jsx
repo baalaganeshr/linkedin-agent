@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { setUserContext, clearUserContext } from '../services/sentry';
 
 const AuthContext = createContext();
 
@@ -19,6 +20,9 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(response.data);
+      
+      // Set Sentry user context
+      setUserContext(response.data);
     } catch (error) {
       localStorage.removeItem('token');
       setToken(null);
@@ -36,6 +40,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
+    
+    // Clear Sentry user context
+    clearUserContext();
   };
 
   useEffect(() => {

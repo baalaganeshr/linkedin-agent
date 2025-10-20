@@ -1,14 +1,18 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { colors } from '../../styles/colors';
 
-export default function Button({ 
+const Button = React.memo(function Button({ 
   children, 
   variant = 'primary', 
   size = 'md',
   onClick,
   disabled = false,
   fullWidth = false,
-  loading = false
+  loading = false,
+  ariaLabel,
+  ariaDescribedBy,
+  type = 'button'
 }) {
   const variants = {
     primary: {
@@ -52,6 +56,12 @@ export default function Button({
       whileTap={disabled || loading ? {} : { scale: 0.98 }}
       onClick={onClick}
       disabled={disabled || loading}
+      type={type}
+      aria-label={ariaLabel || (typeof children === 'string' ? children : undefined)}
+      aria-describedby={ariaDescribedBy}
+      aria-disabled={disabled || loading}
+      aria-busy={loading}
+      role="button"
       style={{
         background: style.background,
         color: style.color,
@@ -97,7 +107,9 @@ export default function Button({
       ) : children}
     </motion.button>
   );
-}
+});
+
+export default Button;
 
 // Add keyframe animation for loading spinner
 const style = document.createElement('style');
